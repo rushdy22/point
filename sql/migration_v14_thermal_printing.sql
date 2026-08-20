@@ -1,0 +1,21 @@
+-- =====================================================================
+-- MIGRATION V14: THERMAL (ESC/POS) PRINTING PER BRANCH (additive, safe)
+-- Adds the cashier-receipt printer connection (a
+-- JSON blob: transport type + connection fields + paper size + chars-per-
+-- line — see src/lib/settings.js) to the branches table, alongside the
+-- logo/tax_rate/printer_name columns migration_v13 already added there.
+--
+-- Stored as `text`, not `jsonb`: this project's Electron/SQLite offline
+-- layer (electron/db/queryEngine.js) binds column values directly into
+-- SQLite without any JSON-aware handling, so the same plain-text-column
+-- shape is used on both the local and remote (Supabase) sides — the app
+-- always JSON.stringify()/JSON.parse()s at the edges (src/lib/settings.js)
+-- rather than relying on the database to understand the structure.
+--
+-- `printer_name` (added by migration_v13) is repurposed going forward to
+-- mean the A4/report printer name only — thermal receipts now use
+-- printer_config instead. No column rename needed: the existing column is
+-- reused, just mapped differently on the JS side (see settings.js).
+-- =====================================================================
+
+alter table public.branches add column if not exists printer_config text;

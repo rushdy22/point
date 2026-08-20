@@ -1,0 +1,3 @@
+-- Retired migration placeholder.
+-- Kept at this path so an old deployment script does not fail because the
+-- historical filename is missing. It intentionally performs no database work.
